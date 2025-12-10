@@ -1,160 +1,176 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>RsLiv Bot - Web</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Café du Rif</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #f9fafb;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      background: var(--tg-theme-bg-color, #111);
+      color: var(--tg-theme-text-color, #fff);
     }
 
-    .app {
-      background: #020617;
-      border-radius: 20px;
-      padding: 24px;
-      max-width: 420px;
-      width: 100%;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      border: 1px solid #1f2937;
+    .container {
+      padding: 20px;
+      max-width: 480px;
+      margin: auto;
     }
 
-    .app-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #34d399, #22c55e);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 20px;
-      color: #022c22;
-    }
-
-    .title {
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
-
-    .subtitle {
-      font-size: 0.9rem;
-      color: #9ca3af;
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 15px;
     }
 
     .card {
-      background: #020617;
-      border: 1px solid #1f2937;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
+      background: var(--tg-theme-secondary-bg-color, #1e1e1e);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
     }
 
-    .card-title {
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .card-text {
-      font-size: 0.9rem;
-      color: #d1d5db;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    .btn {
       width: 100%;
-      padding: 12px 16px;
+      padding: 12px;
+      margin-top: 10px;
       border-radius: 999px;
       border: none;
-      font-size: 1rem;
-      font-weight: 600;
+      font-weight: bold;
       cursor: pointer;
-      text-decoration: none;
-      background: #22c55e;
-      color: #022c22;
-      transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.15s ease;
+      background: var(--tg-theme-button-color, #0088cc);
+      color: var(--tg-theme-button-text-color, #fff);
+      font-size: 16px;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
-      opacity: 0.95;
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--tg-theme-button-color, #0088cc);
+      color: var(--tg-theme-button-color, #0088cc);
     }
 
-    .btn-primary span.icon {
-      font-size: 1.2rem;
+    .item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .hidden {
+      display: none;
     }
 
     .footer {
-      margin-top: 16px;
       text-align: center;
-      font-size: 0.8rem;
-      color: #6b7280;
-    }
-
-    .footer a {
-      color: #60a5fa;
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
+      opacity: 0.7;
+      font-size: 13px;
+      margin-top: 20px;
     }
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="app-header">
-      <div class="avatar">R</div>
-      <div>
-        <div class="title">RsLiv Bot</div>
-        <div class="subtitle">Votre assistant Telegram, maintenant aussi sur le web.</div>
-      </div>
+
+  <div class="container">
+
+    <!-- PAGE ACCUEIL -->
+    <div class="card" id="page-home">
+      <h1>☕ Café du Rif</h1>
+      <p id="welcome"></p>
+      <button class="btn" onclick="goMenu()">📋 Voir le menu</button>
     </div>
 
+    <!-- PAGE MENU -->
+    <div class="card hidden" id="page-menu">
+      <h2>Menu</h2>
+      <button class="btn" onclick="showBoissons()">🥤 Boissons</button>
+      <button class="btn" onclick="showSnacks()">🥐 Snacks</button>
+      <button class="btn btn-outline" onclick="goHome()">⬅️ Retour</button>
+    </div>
+
+    <!-- PAGE BOISSONS -->
+    <div class="card hidden" id="page-boissons">
+      <h2>🥤 Boissons</h2>
+
+      <div class="item"><span>Espresso</span><span>2.00€</span></div>
+      <div class="item"><span>Cappuccino</span><span>3.50€</span></div>
+      <div class="item"><span>Latte</span><span>3.80€</span></div>
+      <div class="item"><span>Thé</span><span>2.50€</span></div>
+      <div class="item"><span>Chocolat chaud</span><span>3.00€</span></div>
+
+      <button class="btn btn-outline" onclick="goMenu()">⬅️ Retour menu</button>
+    </div>
+
+    <!-- PAGE SNACKS -->
+    <div class="card hidden" id="page-snacks">
+      <h2>🥐 Snacks</h2>
+
+      <div class="item"><span>Croissant</span><span>1.20€</span></div>
+      <div class="item"><span>Pain au chocolat</span><span>1.40€</span></div>
+      <div class="item"><span>Cookie</span><span>2.00€</span></div>
+      <div class="item"><span>Sandwich</span><span>4.50€</span></div>
+
+      <button class="btn btn-outline" onclick="goMenu()">⬅️ Retour menu</button>
+    </div>
+
+    <!-- INFOS -->
     <div class="card">
-      <div class="card-title">Connexion via Telegram</div>
-      <p class="card-text">
-        Cliquez sur le bouton ci-dessous pour ouvrir le bot Telegram
-        <strong>@RsLiv8313_bot</strong> et continuer la conversation directement
-        dans l'application Telegram.
-      </p>
+      <h2>📍 Infos</h2>
+      <p>Adresse : 12 Rue Centrale</p>
+      <p>🕒 Lun–Ven : 8h–19h | Sam : 9h–20h</p>
+      <p>☎️ 06 12 34 56 78</p>
     </div>
-
-    <!-- Bouton qui ouvre le bot Telegram -->
-    <a
-      class="btn-primary"
-      href="https://t.me/RsLiv8313_bot"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span class="icon">🤖</span>
-      <span>Ouvrir le bot dans Telegram</span>
-    </a>
 
     <div class="footer">
-      Vous n'avez pas Telegram ?
-      <a href="https://telegram.org" target="_blank" rel="noopener noreferrer">
-        Télécharger Telegram
-      </a>
+      Mini App Telegram • Café du Rif
     </div>
+
   </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const user = tg.initDataUnsafe?.user;
+    const welcome = document.getElementById("welcome");
+
+    if (user) {
+      welcome.textContent = "Bienvenue " + user.first_name + " 👋";
+    } else {
+      welcome.textContent = "Bienvenue 👋";
+    }
+
+    function hideAll() {
+      document.getElementById("page-home").classList.add("hidden");
+      document.getElementById("page-menu").classList.add("hidden");
+      document.getElementById("page-boissons").classList.add("hidden");
+      document.getElementById("page-snacks").classList.add("hidden");
+    }
+
+    function goHome() {
+      hideAll();
+      document.getElementById("page-home").classList.remove("hidden");
+    }
+
+    function goMenu() {
+      hideAll();
+      document.getElementById("page-menu").classList.remove("hidden");
+    }
+
+    function showBoissons() {
+      hideAll();
+      document.getElementById("page-boissons").classList.remove("hidden");
+    }
+
+    function showSnacks() {
+      hideAll();
+      document.getElementById("page-snacks").classList.remove("hidden");
+    }
+  </script>
+
 </body>
 </html>
+</html>
+
