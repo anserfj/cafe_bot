@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Café du Rif</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--tg-theme-bg-color, #111);
+      color: var(--tg-theme-text-color, #fff);
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 480px;
+      margin: auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .card {
+      background: var(--tg-theme-secondary-bg-color, #1e1e1e);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 999px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      background: var(--tg-theme-button-color, #0088cc);
+      color: var(--tg-theme-button-text-color, #fff);
+      font-size: 16px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--tg-theme-button-color, #0088cc);
+      color: var(--tg-theme-button-color, #0088cc);
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      opacity: 0.7;
+      font-size: 13px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- PAGE ACCUEIL -->
+    <div class="card" id="page-home">
+      <h1>☕ Café du Rif</h1>
+      <p id="welcome"></p>
+      <button class="btn" onclick="goMenu()">📋 Voir le menu</button>
+    </div>
+
+    <!-- PAGE MENU -->
+    <div class="card hidden" id="page-menu">
+      <h2>Menu</h2>
+      <button class="btn" onclick="showBoissons()">🥤 Boissons</button>
+      <button class="btn" onclick="showSnacks()">🥐 Snacks</button>
+      <button class="btn btn-outline" onclick="goHome()">⬅️ Retour</button>
+    </div>
+
+    <!-- PAGE BOISSONS -->
+    <div class="card hidden" id="page-boissons">
+      <h2>🥤 Boissons</h2>
+
+      <div class="item"><span>Espresso</span><span>2.00€</span></div>
+      <div class="item"><span>Cappuccino</span><span>3.50€</span></div>
+      <div class="item"><span>Latte</span><span>3.80€</span></div>
+      <div class="item"><span>Thé</span><span>2.50€</span></div>
+      <div class="item"><span>Chocolat chaud</span><span>3.00€</span></div>
+
+      <button class="btn btn-outline" onclick="goMenu()">⬅️ Retour menu</button>
+    </div>
+
+    <!-- PAGE SNACKS -->
+    <div class="card hidden" id="page-snacks">
+      <h2>🥐 Snacks</h2>
+
+      <div class="item"><span>Croissant</span><span>1.20€</span></div>
+      <div class="item"><span>Pain au chocolat</span><span>1.40€</span></div>
+      <div class="item"><span>Cookie</span><span>2.00€</span></div>
+      <div class="item"><span>Sandwich</span><span>4.50€</span></div>
+
+      <button class="btn btn-outline" onclick="goMenu()">⬅️ Retour menu</button>
+    </div>
+
+    <!-- INFOS -->
+    <div class="card">
+      <h2>📍 Infos</h2>
+      <p>Adresse : 12 Rue Centrale</p>
+      <p>🕒 Lun–Ven : 8h–19h | Sam : 9h–20h</p>
+      <p>☎️ 06 12 34 56 78</p>
+    </div>
+
+    <div class="footer">
+      Mini App Telegram • Café du Rif
+    </div>
+
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const user = tg.initDataUnsafe?.user;
+    const welcome = document.getElementById("welcome");
+
+    if (user) {
+      welcome.textContent = "Bienvenue " + user.first_name + " 👋";
+    } else {
+      welcome.textContent = "Bienvenue 👋";
+    }
+
+    function hideAll() {
+      document.getElementById("page-home").classList.add("hidden");
+      document.getElementById("page-menu").classList.add("hidden");
+      document.getElementById("page-boissons").classList.add("hidden");
+      document.getElementById("page-snacks").classList.add("hidden");
+    }
+
+    function goHome() {
+      hideAll();
+      document.getElementById("page-home").classList.remove("hidden");
+    }
+
+    function goMenu() {
+      hideAll();
+      document.getElementById("page-menu").classList.remove("hidden");
+    }
+
+    function showBoissons() {
+      hideAll();
+      document.getElementById("page-boissons").classList.remove("hidden");
+    }
+
+    function showSnacks() {
+      hideAll();
+      document.getElementById("page-snacks").classList.remove("hidden");
+    }
+  </script>
+
+</body>
+</html>
