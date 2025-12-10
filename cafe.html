@@ -2,524 +2,159 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Café du Rif - Commande</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- SDK Telegram WebApp -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+  <title>RsLiv Bot - Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
-      /* couleurs fallback si pas dans Telegram */
-      --bg: #111;
-      --bg-secondary: #1d1d1d;
-      --text: #ffffff;
-      --accent: #0088cc;
-    }
-
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--tg-theme-bg-color, var(--bg));
-      color: var(--tg-theme-text-color, var(--text));
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #f9fafb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
     .app {
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 16px;
-      padding-bottom: 80px; /* laisser la place au MainButton Telegram */
+      background: #020617;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid #1f2937;
     }
 
-    header {
+    .app-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    header h1 {
-      font-size: 20px;
-      margin: 0;
-    }
-
-    header span {
-      font-size: 13px;
-      opacity: 0.8;
-    }
-
-    .card {
-      background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-    }
-
-    .title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .title-row h2 {
-      font-size: 18px;
-      margin: 0;
-    }
-
-    .pill {
-      padding: 4px 10px;
-      font-size: 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-    }
-
-    .btn {
-      border: none;
-      border-radius: 999px;
-      padding: 10px 16px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-      background: var(--tg-theme-button-color, var(--accent));
-      color: var(--tg-theme-button-text-color, #fff);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--tg-theme-button-color, var(--accent));
-      color: var(--tg-theme-button-color, var(--accent));
-    }
-
-    .btn-small {
-      padding: 5px 10px;
-      font-size: 12px;
-    }
-
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .chip {
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid transparent;
-      cursor: pointer;
-    }
-
-    .chip.active {
-      border-color: var(--tg-theme-button-color, var(--accent));
-      background: rgba(0,136,204,0.15);
-    }
-
-    .product-list {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .product {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .product-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .product-name {
-      font-size: 15px;
-      margin-bottom: 2px;
-    }
-
-    .product-desc {
-      font-size: 12px;
-      opacity: 0.7;
-    }
-
-    .product-price {
-      font-size: 14px;
-      margin-top: 2px;
-      font-weight: 600;
-    }
-
-    .qty {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .qty button {
-      width: 26px;
-      height: 26px;
+    .avatar {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      background: rgba(255,255,255,0.08);
-      color: inherit;
+      background: linear-gradient(135deg, #34d399, #22c55e);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      color: #022c22;
     }
 
-    .qty span {
-      min-width: 18px;
-      text-align: center;
-      font-size: 14px;
+    .title {
+      font-size: 1.4rem;
+      font-weight: 700;
     }
 
-    .hidden {
-      display: none;
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
     }
 
-    .cart-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      margin: 4px 0;
+    .card {
+      background: #020617;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
     }
 
-    .muted {
-      opacity: 0.7;
-      font-size: 12px;
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 6px;
     }
 
-    .back-link {
-      font-size: 13px;
-      cursor: pointer;
+    .card-text {
+      font-size: 0.9rem;
+      color: #d1d5db;
+    }
+
+    .btn-primary {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      opacity: 0.8;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      background: #22c55e;
+      color: #022c22;
+      transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.15s ease;
     }
 
-    .back-link span {
+    .btn-primary:hover {
       transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+      opacity: 0.95;
+    }
+
+    .btn-primary span.icon {
+      font-size: 1.2rem;
+    }
+
+    .footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .footer a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
-
 <body>
   <div class="app">
+    <div class="app-header">
+      <div class="avatar">R</div>
+      <div>
+        <div class="title">RsLiv Bot</div>
+        <div class="subtitle">Votre assistant Telegram, maintenant aussi sur le web.</div>
+      </div>
+    </div>
 
-    <!-- ÉCRAN ACCUEIL -->
-    <div id="screen-home" class="card">
-      <header>
-        <div>
-          <h1>Café du Rif</h1>
-          <span id="welcome-text">Bienvenue 👋</span>
-        </div>
-        <span class="pill">Ouvert aujourd’hui</span>
-      </header>
-
-      <p style="font-size:13px; opacity:.8; margin-top:6px;">
-        Commande ton café et tes snacks directement depuis Telegram.
+    <div class="card">
+      <div class="card-title">Connexion via Telegram</div>
+      <p class="card-text">
+        Cliquez sur le bouton ci-dessous pour ouvrir le bot Telegram
+        <strong>@RsLiv8313_bot</strong> et continuer la conversation directement
+        dans l'application Telegram.
       </p>
-
-      <div style="display:flex; gap:8px; margin-top:12px;">
-        <button class="btn" style="flex:2" onclick="openMenu()">📋 Voir le menu</button>
-        <button class="btn btn-outline" style="flex:1" onclick="openCart()">🧺 Panier</button>
-      </div>
     </div>
 
-    <!-- ÉCRAN MENU / PRODUITS -->
-    <div id="screen-menu" class="card hidden">
-      <div class="title-row">
-        <div>
-          <div class="back-link" onclick="goHome()">
-            <span>◀</span> <span>Accueil</span>
-          </div>
-          <h2>Menu</h2>
-        </div>
-        <span class="pill" id="cart-badge">Panier : 0€</span>
-      </div>
+    <!-- Bouton qui ouvre le bot Telegram -->
+    <a
+      class="btn-primary"
+      href="https://t.me/RsLiv8313_bot"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="icon">🤖</span>
+      <span>Ouvrir le bot dans Telegram</span>
+    </a>
 
-      <div class="chip-row" id="category-row">
-        <!-- boutons de catégories remplis par JS -->
-      </div>
-
-      <div class="product-list" id="product-list">
-        <!-- produits remplis par JS -->
-      </div>
+    <div class="footer">
+      Vous n'avez pas Telegram ?
+      <a href="https://telegram.org" target="_blank" rel="noopener noreferrer">
+        Télécharger Telegram
+      </a>
     </div>
-
-    <!-- ÉCRAN PANIER -->
-    <div id="screen-cart" class="card hidden">
-      <div class="title-row">
-        <div>
-          <div class="back-link" onclick="openMenu()">
-            <span>◀</span> <span>Menu</span>
-          </div>
-          <h2>Panier</h2>
-        </div>
-      </div>
-
-      <div id="cart-empty">
-        <p style="margin-top:8px;">Ton panier est vide pour l’instant.</p>
-        <button class="btn btn-small" onclick="openMenu()">📋 Voir le menu</button>
-      </div>
-
-      <div id="cart-filled" class="hidden">
-        <div id="cart-items"></div>
-        <hr style="border-color:#333; margin:10px 0;">
-        <div class="cart-row">
-          <span>Total</span>
-          <span id="cart-total">0.00 €</span>
-        </div>
-        <p class="muted">
-          Le paiement se fera au comptoir ou selon les instructions envoyées par le bot.
-        </p>
-      </div>
-    </div>
-
   </div>
-
-  <script>
-    // ---- Intégration Telegram ----
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.ready();
-
-    const user = tg.initDataUnsafe?.user;
-    if (user) {
-      document.getElementById("welcome-text").textContent =
-        "Bienvenue " + user.first_name + " 👋";
-    }
-
-    // ---- Données du menu ----
-    const menuData = {
-      "Boissons chaudes": [
-        { id: "espresso", name: "Espresso", desc: "Court et intense", price: 2.0 },
-        { id: "cappuccino", name: "Cappuccino", desc: "Avec lait mousseux", price: 3.5 },
-        { id: "latte", name: "Latte", desc: "Doux et crémeux", price: 3.8 },
-        { id: "choco", name: "Chocolat chaud", desc: "Au lait", price: 3.0 }
-      ],
-      "Boissons froides": [
-        { id: "iced_latte", name: "Iced Latte", desc: "Café froid au lait", price: 4.2 },
-        { id: "jus_orange", name: "Jus d’orange", desc: "Pressé", price: 3.0 }
-      ],
-      "Snacks": [
-        { id: "croissant", name: "Croissant", desc: "Pur beurre", price: 1.2 },
-        { id: "pain_choco", name: "Pain au chocolat", desc: "", price: 1.4 },
-        { id: "cookie", name: "Cookie", desc: "Chocolat", price: 2.0 },
-        { id: "sandwich", name: "Sandwich jambon-fromage", desc: "", price: 4.5 }
-      ]
-    };
-
-    // ---- État ----
-    let selectedCategory = Object.keys(menuData)[0];
-    const cart = {}; // { productId: {product, qty} }
-
-    // ---- DOM helpers ----
-    const screenHome = document.getElementById("screen-home");
-    const screenMenu = document.getElementById("screen-menu");
-    const screenCart = document.getElementById("screen-cart");
-    const categoryRow = document.getElementById("category-row");
-    const productList = document.getElementById("product-list");
-    const cartBadge = document.getElementById("cart-badge");
-    const cartEmpty = document.getElementById("cart-empty");
-    const cartFilled = document.getElementById("cart-filled");
-    const cartItemsEl = document.getElementById("cart-items");
-    const cartTotalEl = document.getElementById("cart-total");
-
-    function showScreen(name) {
-      screenHome.classList.add("hidden");
-      screenMenu.classList.add("hidden");
-      screenCart.classList.add("hidden");
-      if (name === "home") screenHome.classList.remove("hidden");
-      if (name === "menu") screenMenu.classList.remove("hidden");
-      if (name === "cart") screenCart.classList.remove("hidden");
-    }
-
-    function goHome() {
-      showScreen("home");
-      tg.MainButton.hide();
-    }
-
-    function openMenu() {
-      showScreen("menu");
-      renderCategories();
-      renderProducts();
-      updateMainButton();
-    }
-
-    function openCart() {
-      showScreen("cart");
-      renderCart();
-      updateMainButton();
-    }
-
-    // ---- Rendu des catégories & produits ----
-    function renderCategories() {
-      categoryRow.innerHTML = "";
-      Object.keys(menuData).forEach(cat => {
-        const chip = document.createElement("button");
-        chip.className = "chip" + (cat === selectedCategory ? " active" : "");
-        chip.textContent = cat;
-        chip.onclick = () => {
-          selectedCategory = cat;
-          renderCategories();
-          renderProducts();
-        };
-        categoryRow.appendChild(chip);
-      });
-    }
-
-    function renderProducts() {
-      productList.innerHTML = "";
-      const products = menuData[selectedCategory] || [];
-      products.forEach(prod => {
-        const row = document.createElement("div");
-        row.className = "product";
-
-        const info = document.createElement("div");
-        info.className = "product-info";
-        const name = document.createElement("div");
-        name.className = "product-name";
-        name.textContent = prod.name;
-        const desc = document.createElement("div");
-        desc.className = "product-desc";
-        desc.textContent = prod.desc;
-        const price = document.createElement("div");
-        price.className = "product-price";
-        price.textContent = prod.price.toFixed(2) + " €";
-
-        info.appendChild(name);
-        if (prod.desc) info.appendChild(desc);
-        info.appendChild(price);
-
-        const qtyBox = document.createElement("div");
-        qtyBox.className = "qty";
-
-        const minus = document.createElement("button");
-        minus.textContent = "−";
-        const plus = document.createElement("button");
-        plus.textContent = "+";
-        const value = document.createElement("span");
-        const currentQty = cart[prod.id]?.qty || 0;
-        value.textContent = currentQty;
-
-        minus.onclick = () => changeQty(prod, -1);
-        plus.onclick = () => changeQty(prod, 1);
-
-        qtyBox.appendChild(minus);
-        qtyBox.appendChild(value);
-        qtyBox.appendChild(plus);
-
-        row.appendChild(info);
-        row.appendChild(qtyBox);
-        productList.appendChild(row);
-      });
-    }
-
-    function changeQty(prod, delta) {
-      const entry = cart[prod.id] || { product: prod, qty: 0 };
-      entry.qty += delta;
-      if (entry.qty <= 0) {
-        delete cart[prod.id];
-      } else {
-        cart[prod.id] = entry;
-      }
-      renderProducts();
-      renderCart();
-      updateMainButton();
-    }
-
-    // ---- Panier ----
-    function getCartSummary() {
-      let total = 0;
-      let count = 0;
-      Object.values(cart).forEach(({ product, qty }) => {
-        total += product.price * qty;
-        count += qty;
-      });
-      return { total, count };
-    }
-
-    function renderCart() {
-      const { total, count } = getCartSummary();
-      if (count === 0) {
-        cartEmpty.classList.remove("hidden");
-        cartFilled.classList.add("hidden");
-        cartBadge.textContent = "Panier : 0€";
-        return;
-      }
-
-      cartEmpty.classList.add("hidden");
-      cartFilled.classList.remove("hidden");
-
-      cartItemsEl.innerHTML = "";
-      Object.values(cart).forEach(({ product, qty }) => {
-        const row = document.createElement("div");
-        row.className = "cart-row";
-        const left = document.createElement("span");
-        left.textContent = product.name + " × " + qty;
-        const right = document.createElement("span");
-        right.textContent = (product.price * qty).toFixed(2) + " €";
-        row.appendChild(left);
-        row.appendChild(right);
-        cartItemsEl.appendChild(row);
-      });
-
-      cartTotalEl.textContent = total.toFixed(2) + " €";
-      cartBadge.textContent = "Panier : " + total.toFixed(2) + "€";
-    }
-
-    // ---- MainButton Telegram (Commander) ----
-    function updateMainButton() {
-      const { total, count } = getCartSummary();
-      if (count === 0) {
-        tg.MainButton.hide();
-        return;
-      }
-      tg.MainButton.setText("✅ Envoyer la commande (" + total.toFixed(2) + " €)");
-      tg.MainButton.show();
-      tg.MainButton.onClick(sendOrder);
-    }
-
-    function sendOrder() {
-      const { total, count } = getCartSummary();
-      if (count === 0) return;
-
-      const order = {
-        type: "order",
-        items: Object.values(cart).map(({ product, qty }) => ({
-          id: product.id,
-          name: product.name,
-          qty,
-          price: product.price
-        })),
-        total: total,
-        customer: user ? {
-          id: user.id,
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name
-        } : null,
-        ts: Date.now()
-      };
-
-      // Envoie les données au bot (Update.web_app_data)
-      tg.sendData(JSON.stringify(order));
-
-      tg.MainButton.setText("✅ Commande envoyée");
-      setTimeout(() => {
-        tg.close();
-      }, 800);
-    }
-
-    // écran initial
-    goHome();
-  </script>
 </body>
 </html>
