@@ -1,174 +1,525 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Café du Rif</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Café du Rif - Commande</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- SDK Telegram WebApp -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
+    :root {
+      /* couleurs fallback si pas dans Telegram */
+      --bg: #111;
+      --bg-secondary: #1d1d1d;
+      --text: #ffffff;
+      --accent: #0088cc;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--tg-theme-bg-color, #111);
-      color: var(--tg-theme-text-color, #fff);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--tg-theme-bg-color, var(--bg));
+      color: var(--tg-theme-text-color, var(--text));
     }
 
-    .container {
-      padding: 20px;
-      max-width: 480px;
-      margin: auto;
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 80px; /* laisser la place au MainButton Telegram */
     }
 
-    h1, h2 {
-      text-align: center;
-      margin-bottom: 15px;
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    header span {
+      font-size: 13px;
+      opacity: 0.8;
     }
 
     .card {
-      background: var(--tg-theme-secondary-bg-color, #1e1e1e);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 15px;
+      background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .title-row h2 {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
     }
 
     .btn {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 999px;
       border: none;
-      font-weight: bold;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 600;
       cursor: pointer;
-      background: var(--tg-theme-button-color, #0088cc);
+      font-size: 14px;
+      background: var(--tg-theme-button-color, var(--accent));
       color: var(--tg-theme-button-text-color, #fff);
-      font-size: 16px;
     }
 
     .btn-outline {
       background: transparent;
-      border: 2px solid var(--tg-theme-button-color, #0088cc);
-      color: var(--tg-theme-button-color, #0088cc);
+      border: 1px solid var(--tg-theme-button-color, var(--accent));
+      color: var(--tg-theme-button-color, var(--accent));
     }
 
-    .item {
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .chip-row {
       display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      border-color: var(--tg-theme-button-color, var(--accent));
+      background: rgba(0,136,204,0.15);
+    }
+
+    .product-list {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product {
+      display: flex;
+      align-items: center;
       justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid #333;
+      gap: 10px;
+    }
+
+    .product-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-name {
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+
+    .product-desc {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .product-price {
+      font-size: 14px;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .qty {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .qty button {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      background: rgba(255,255,255,0.08);
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty span {
+      min-width: 18px;
+      text-align: center;
+      font-size: 14px;
     }
 
     .hidden {
       display: none;
     }
 
-    .footer {
-      text-align: center;
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin: 4px 0;
+    }
+
+    .muted {
       opacity: 0.7;
+      font-size: 12px;
+    }
+
+    .back-link {
       font-size: 13px;
-      margin-top: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.8;
+    }
+
+    .back-link span {
+      transform: translateY(-1px);
     }
   </style>
 </head>
 
 <body>
+  <div class="app">
 
-  <div class="container">
+    <!-- ÉCRAN ACCUEIL -->
+    <div id="screen-home" class="card">
+      <header>
+        <div>
+          <h1>Café du Rif</h1>
+          <span id="welcome-text">Bienvenue 👋</span>
+        </div>
+        <span class="pill">Ouvert aujourd’hui</span>
+      </header>
 
-    <!-- PAGE ACCUEIL -->
-    <div class="card" id="page-home">
-      <h1>☕ Café du Rif</h1>
-      <p id="welcome"></p>
-      <button class="btn" onclick="goMenu()">📋 Voir le menu</button>
+      <p style="font-size:13px; opacity:.8; margin-top:6px;">
+        Commande ton café et tes snacks directement depuis Telegram.
+      </p>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn" style="flex:2" onclick="openMenu()">📋 Voir le menu</button>
+        <button class="btn btn-outline" style="flex:1" onclick="openCart()">🧺 Panier</button>
+      </div>
     </div>
 
-    <!-- PAGE MENU -->
-    <div class="card hidden" id="page-menu">
-      <h2>Menu</h2>
-      <button class="btn" onclick="showBoissons()">🥤 Boissons</button>
-      <button class="btn" onclick="showSnacks()">🥐 Snacks</button>
-      <button class="btn btn-outline" onclick="goHome()">⬅️ Retour</button>
+    <!-- ÉCRAN MENU / PRODUITS -->
+    <div id="screen-menu" class="card hidden">
+      <div class="title-row">
+        <div>
+          <div class="back-link" onclick="goHome()">
+            <span>◀</span> <span>Accueil</span>
+          </div>
+          <h2>Menu</h2>
+        </div>
+        <span class="pill" id="cart-badge">Panier : 0€</span>
+      </div>
+
+      <div class="chip-row" id="category-row">
+        <!-- boutons de catégories remplis par JS -->
+      </div>
+
+      <div class="product-list" id="product-list">
+        <!-- produits remplis par JS -->
+      </div>
     </div>
 
-    <!-- PAGE BOISSONS -->
-    <div class="card hidden" id="page-boissons">
-      <h2>🥤 Boissons</h2>
+    <!-- ÉCRAN PANIER -->
+    <div id="screen-cart" class="card hidden">
+      <div class="title-row">
+        <div>
+          <div class="back-link" onclick="openMenu()">
+            <span>◀</span> <span>Menu</span>
+          </div>
+          <h2>Panier</h2>
+        </div>
+      </div>
 
-      <div class="item"><span>Espresso</span><span>2.00€</span></div>
-      <div class="item"><span>Cappuccino</span><span>3.50€</span></div>
-      <div class="item"><span>Latte</span><span>3.80€</span></div>
-      <div class="item"><span>Thé</span><span>2.50€</span></div>
-      <div class="item"><span>Chocolat chaud</span><span>3.00€</span></div>
+      <div id="cart-empty">
+        <p style="margin-top:8px;">Ton panier est vide pour l’instant.</p>
+        <button class="btn btn-small" onclick="openMenu()">📋 Voir le menu</button>
+      </div>
 
-      <button class="btn btn-outline" onclick="goMenu()">⬅️ Retour menu</button>
-    </div>
-
-    <!-- PAGE SNACKS -->
-    <div class="card hidden" id="page-snacks">
-      <h2>🥐 Snacks</h2>
-
-      <div class="item"><span>Croissant</span><span>1.20€</span></div>
-      <div class="item"><span>Pain au chocolat</span><span>1.40€</span></div>
-      <div class="item"><span>Cookie</span><span>2.00€</span></div>
-      <div class="item"><span>Sandwich</span><span>4.50€</span></div>
-
-      <button class="btn btn-outline" onclick="goMenu()">⬅️ Retour menu</button>
-    </div>
-
-    <!-- INFOS -->
-    <div class="card">
-      <h2>📍 Infos</h2>
-      <p>Adresse : 12 Rue Centrale</p>
-      <p>🕒 Lun–Ven : 8h–19h | Sam : 9h–20h</p>
-      <p>☎️ 06 12 34 56 78</p>
-    </div>
-
-    <div class="footer">
-      Mini App Telegram • Café du Rif
+      <div id="cart-filled" class="hidden">
+        <div id="cart-items"></div>
+        <hr style="border-color:#333; margin:10px 0;">
+        <div class="cart-row">
+          <span>Total</span>
+          <span id="cart-total">0.00 €</span>
+        </div>
+        <p class="muted">
+          Le paiement se fera au comptoir ou selon les instructions envoyées par le bot.
+        </p>
+      </div>
     </div>
 
   </div>
 
   <script>
+    // ---- Intégration Telegram ----
     const tg = window.Telegram.WebApp;
     tg.expand();
+    tg.ready();
 
     const user = tg.initDataUnsafe?.user;
-    const welcome = document.getElementById("welcome");
-
     if (user) {
-      welcome.textContent = "Bienvenue " + user.first_name + " 👋";
-    } else {
-      welcome.textContent = "Bienvenue 👋";
+      document.getElementById("welcome-text").textContent =
+        "Bienvenue " + user.first_name + " 👋";
     }
 
-    function hideAll() {
-      document.getElementById("page-home").classList.add("hidden");
-      document.getElementById("page-menu").classList.add("hidden");
-      document.getElementById("page-boissons").classList.add("hidden");
-      document.getElementById("page-snacks").classList.add("hidden");
+    // ---- Données du menu ----
+    const menuData = {
+      "Boissons chaudes": [
+        { id: "espresso", name: "Espresso", desc: "Court et intense", price: 2.0 },
+        { id: "cappuccino", name: "Cappuccino", desc: "Avec lait mousseux", price: 3.5 },
+        { id: "latte", name: "Latte", desc: "Doux et crémeux", price: 3.8 },
+        { id: "choco", name: "Chocolat chaud", desc: "Au lait", price: 3.0 }
+      ],
+      "Boissons froides": [
+        { id: "iced_latte", name: "Iced Latte", desc: "Café froid au lait", price: 4.2 },
+        { id: "jus_orange", name: "Jus d’orange", desc: "Pressé", price: 3.0 }
+      ],
+      "Snacks": [
+        { id: "croissant", name: "Croissant", desc: "Pur beurre", price: 1.2 },
+        { id: "pain_choco", name: "Pain au chocolat", desc: "", price: 1.4 },
+        { id: "cookie", name: "Cookie", desc: "Chocolat", price: 2.0 },
+        { id: "sandwich", name: "Sandwich jambon-fromage", desc: "", price: 4.5 }
+      ]
+    };
+
+    // ---- État ----
+    let selectedCategory = Object.keys(menuData)[0];
+    const cart = {}; // { productId: {product, qty} }
+
+    // ---- DOM helpers ----
+    const screenHome = document.getElementById("screen-home");
+    const screenMenu = document.getElementById("screen-menu");
+    const screenCart = document.getElementById("screen-cart");
+    const categoryRow = document.getElementById("category-row");
+    const productList = document.getElementById("product-list");
+    const cartBadge = document.getElementById("cart-badge");
+    const cartEmpty = document.getElementById("cart-empty");
+    const cartFilled = document.getElementById("cart-filled");
+    const cartItemsEl = document.getElementById("cart-items");
+    const cartTotalEl = document.getElementById("cart-total");
+
+    function showScreen(name) {
+      screenHome.classList.add("hidden");
+      screenMenu.classList.add("hidden");
+      screenCart.classList.add("hidden");
+      if (name === "home") screenHome.classList.remove("hidden");
+      if (name === "menu") screenMenu.classList.remove("hidden");
+      if (name === "cart") screenCart.classList.remove("hidden");
     }
 
     function goHome() {
-      hideAll();
-      document.getElementById("page-home").classList.remove("hidden");
+      showScreen("home");
+      tg.MainButton.hide();
     }
 
-    function goMenu() {
-      hideAll();
-      document.getElementById("page-menu").classList.remove("hidden");
+    function openMenu() {
+      showScreen("menu");
+      renderCategories();
+      renderProducts();
+      updateMainButton();
     }
 
-    function showBoissons() {
-      hideAll();
-      document.getElementById("page-boissons").classList.remove("hidden");
+    function openCart() {
+      showScreen("cart");
+      renderCart();
+      updateMainButton();
     }
 
-    function showSnacks() {
-      hideAll();
-      document.getElementById("page-snacks").classList.remove("hidden");
+    // ---- Rendu des catégories & produits ----
+    function renderCategories() {
+      categoryRow.innerHTML = "";
+      Object.keys(menuData).forEach(cat => {
+        const chip = document.createElement("button");
+        chip.className = "chip" + (cat === selectedCategory ? " active" : "");
+        chip.textContent = cat;
+        chip.onclick = () => {
+          selectedCategory = cat;
+          renderCategories();
+          renderProducts();
+        };
+        categoryRow.appendChild(chip);
+      });
     }
+
+    function renderProducts() {
+      productList.innerHTML = "";
+      const products = menuData[selectedCategory] || [];
+      products.forEach(prod => {
+        const row = document.createElement("div");
+        row.className = "product";
+
+        const info = document.createElement("div");
+        info.className = "product-info";
+        const name = document.createElement("div");
+        name.className = "product-name";
+        name.textContent = prod.name;
+        const desc = document.createElement("div");
+        desc.className = "product-desc";
+        desc.textContent = prod.desc;
+        const price = document.createElement("div");
+        price.className = "product-price";
+        price.textContent = prod.price.toFixed(2) + " €";
+
+        info.appendChild(name);
+        if (prod.desc) info.appendChild(desc);
+        info.appendChild(price);
+
+        const qtyBox = document.createElement("div");
+        qtyBox.className = "qty";
+
+        const minus = document.createElement("button");
+        minus.textContent = "−";
+        const plus = document.createElement("button");
+        plus.textContent = "+";
+        const value = document.createElement("span");
+        const currentQty = cart[prod.id]?.qty || 0;
+        value.textContent = currentQty;
+
+        minus.onclick = () => changeQty(prod, -1);
+        plus.onclick = () => changeQty(prod, 1);
+
+        qtyBox.appendChild(minus);
+        qtyBox.appendChild(value);
+        qtyBox.appendChild(plus);
+
+        row.appendChild(info);
+        row.appendChild(qtyBox);
+        productList.appendChild(row);
+      });
+    }
+
+    function changeQty(prod, delta) {
+      const entry = cart[prod.id] || { product: prod, qty: 0 };
+      entry.qty += delta;
+      if (entry.qty <= 0) {
+        delete cart[prod.id];
+      } else {
+        cart[prod.id] = entry;
+      }
+      renderProducts();
+      renderCart();
+      updateMainButton();
+    }
+
+    // ---- Panier ----
+    function getCartSummary() {
+      let total = 0;
+      let count = 0;
+      Object.values(cart).forEach(({ product, qty }) => {
+        total += product.price * qty;
+        count += qty;
+      });
+      return { total, count };
+    }
+
+    function renderCart() {
+      const { total, count } = getCartSummary();
+      if (count === 0) {
+        cartEmpty.classList.remove("hidden");
+        cartFilled.classList.add("hidden");
+        cartBadge.textContent = "Panier : 0€";
+        return;
+      }
+
+      cartEmpty.classList.add("hidden");
+      cartFilled.classList.remove("hidden");
+
+      cartItemsEl.innerHTML = "";
+      Object.values(cart).forEach(({ product, qty }) => {
+        const row = document.createElement("div");
+        row.className = "cart-row";
+        const left = document.createElement("span");
+        left.textContent = product.name + " × " + qty;
+        const right = document.createElement("span");
+        right.textContent = (product.price * qty).toFixed(2) + " €";
+        row.appendChild(left);
+        row.appendChild(right);
+        cartItemsEl.appendChild(row);
+      });
+
+      cartTotalEl.textContent = total.toFixed(2) + " €";
+      cartBadge.textContent = "Panier : " + total.toFixed(2) + "€";
+    }
+
+    // ---- MainButton Telegram (Commander) ----
+    function updateMainButton() {
+      const { total, count } = getCartSummary();
+      if (count === 0) {
+        tg.MainButton.hide();
+        return;
+      }
+      tg.MainButton.setText("✅ Envoyer la commande (" + total.toFixed(2) + " €)");
+      tg.MainButton.show();
+      tg.MainButton.onClick(sendOrder);
+    }
+
+    function sendOrder() {
+      const { total, count } = getCartSummary();
+      if (count === 0) return;
+
+      const order = {
+        type: "order",
+        items: Object.values(cart).map(({ product, qty }) => ({
+          id: product.id,
+          name: product.name,
+          qty,
+          price: product.price
+        })),
+        total: total,
+        customer: user ? {
+          id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name
+        } : null,
+        ts: Date.now()
+      };
+
+      // Envoie les données au bot (Update.web_app_data)
+      tg.sendData(JSON.stringify(order));
+
+      tg.MainButton.setText("✅ Commande envoyée");
+      setTimeout(() => {
+        tg.close();
+      }, 800);
+    }
+
+    // écran initial
+    goHome();
   </script>
-
 </body>
 </html>
